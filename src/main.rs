@@ -8,6 +8,7 @@ struct Node<T> {
     value: T,
     left: Option<Box<Node<T>>>,
     right: Option<Box<Node<T>>>,
+    height: i32,
 }
 
 fn insert_node<T: PartialOrd>(value: T, root: &mut Node<T>) {
@@ -19,6 +20,7 @@ fn insert_node<T: PartialOrd>(value: T, root: &mut Node<T>) {
                     value,
                     left: None,
                     right: None,
+                    height: 0
                 }));
             }
         }
@@ -30,6 +32,7 @@ fn insert_node<T: PartialOrd>(value: T, root: &mut Node<T>) {
                     value,
                     left: None,
                     right: None,
+                    height: 0
                 }));
             }
         }
@@ -57,6 +60,7 @@ fn build_tree(dataset: &Vec<i32>) -> Node<i32> {
         value: dataset[0],
         left: None,
         right: None,
+        height: 0
     };
     println!("Building binary tree, with nodes {:?}", dataset.len());
     let time_start = std::time::Instant::now();
@@ -87,6 +91,7 @@ fn build_avl_tree(dataset: &Vec<i32>) -> Node<i32> {
         value: dataset[0],
         left: None,
         right: None,
+        height: 0
     }));
     println!("Building AVL tree, with nodes {:?}", dataset.len());
     let time_start = std::time::Instant::now();
@@ -106,6 +111,8 @@ fn insert_avl_node<T: PartialOrd + Copy>(value: T, root: &mut Option<Box<Node<T>
         } else {
             insert_avl_node(value, &mut node.right);
         }
+
+        node.height = 1 + max(height(&node.left), height(&node.right));
 
         let balance = balance_factor(node);
 
@@ -133,6 +140,7 @@ fn insert_avl_node<T: PartialOrd + Copy>(value: T, root: &mut Option<Box<Node<T>
             value,
             left: None,
             right: None,
+            height: 0,
         }));
     }
 }
@@ -143,6 +151,12 @@ fn left_rotate<T: PartialOrd>(node: &mut Option<Box<Node<T>>>) {
             x.right = y.left;
             y.left = Some(x);
             *node = Some(y);
+
+            if let Some(ref mut x) = node.as_mut().unwrap().left {
+                x.height = 1 + max(height(&x.left), height(&x.right));
+            }
+            node.as_mut().unwrap().height = 1 + max(height(&node.as_ref().unwrap().left), height(&node.as_ref().unwrap().right));
+
         } else {
             *node = Some(x);
         }
@@ -155,6 +169,12 @@ fn right_rotate<T: PartialOrd>(node: &mut Option<Box<Node<T>>>) {
             y.left = x.right;
             x.right = Some(y);
             *node = Some(x);
+
+            if let Some(ref mut y) = node.as_mut().unwrap().right {
+                y.height = 1 + max(height(&y.left), height(&y.right));
+            }
+            node.as_mut().unwrap().height = 1 + max(height(&node.as_ref().unwrap().left), height(&node.as_ref().unwrap().right));
+
         } else {
             *node = Some(y);
         }
@@ -165,9 +185,17 @@ fn balance_factor<T>(node: &mut Box<Node<T>>) -> i32 {
     height(&node.left) - height(&node.right)
 }
 
+fn height_bst<T>(node: &Option<Box<Node<T>>>) -> i32 {
+    if let Some(node) = node {
+        max(height_bst(&node.left), height_bst(&node.right)) + 1
+    } else {
+        0
+    }
+}
+
 fn height<T>(node: &Option<Box<Node<T>>>) -> i32 {
     if let Some(node) = node {
-        max(height(&node.left), height(&node.right)) + 1
+        node.height
     } else {
         0
     }
@@ -193,7 +221,7 @@ fn main() {
     let random_value = rng.gen_range(1..n);
     // search for a value that is not in the tree
     search_value(&root, random_value);
-    println!("BST Tree length: {:?}", height(&Some(Box::new(root))));
+    println!("BST Tree length: {:?}", height_bst(&Some(Box::new(root))));
 
     let root = build_avl_tree(&data_set);
     search_value(&root, value);
