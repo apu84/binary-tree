@@ -1,5 +1,7 @@
-use std::cmp::{max, Ordering};
+use dotenv::dotenv;
 use rand::Rng;
+use std::cmp::{max, Ordering};
+use std::env;
 
 #[derive(Debug)]
 struct Node<T> {
@@ -172,30 +174,29 @@ fn height<T>(node: &Option<Box<Node<T>>>) -> i32 {
 }
 
 fn main() {
-    const N: i32 = 100000;
-    const MAX_VALUE: i32 = 100000000;
+    dotenv().ok();
+    let n: i32 = env::var("N").expect("N not set").parse().expect("N is not a valid integer");
+    let max_value: i32 = env::var("MAX_VALUE").expect("MAX_VALUE not set").parse().expect("MAX_VALUE is not a valid integer");
     let mut data_set = Vec::new();
     let mut rng = rand::thread_rng();
-    for _ in 0..N {
-        let random_value = rng.gen_range(1..MAX_VALUE);
+    for _ in 0..n {
+        let random_value = rng.gen_range(1..max_value);
         data_set.push(random_value);
     }
 
     let root = build_tree(&data_set);
     // search for a value that is in the tree
-    let value = data_set[rng.gen_range(0..N) as usize];
+    let value = data_set[rng.gen_range(0..n) as usize];
     search_value(&root, value);
 
     let mut rng = rand::thread_rng();
-    let random_value = rng.gen_range(1..N);
+    let random_value = rng.gen_range(1..n);
     // search for a value that is not in the tree
     search_value(&root, random_value);
     println!("BST Tree length: {:?}", height(&Some(Box::new(root))));
 
     let root = build_avl_tree(&data_set);
     search_value(&root, value);
-    let mut rng = rand::thread_rng();
-    let random_value = rng.gen_range(1..N);
     // search for a value that is not in the tree
     search_value(&root, random_value);
     println!("AVL BST Tree length: {:?}", height(&Some(Box::new(root))));
