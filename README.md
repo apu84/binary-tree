@@ -19,9 +19,9 @@ Searching for: [8809]
 Elapsed time: 430ns
 Found: false
 No of read: 21
-BST Tree length: 41
+BST tree length: 41
 ---------------------------------
-Building AVL tree, with nodes 100000
+Building Balanced binary tree, with nodes 100000 (AVL)
 Elapsed time: 231.744956412s
 ---------------------------------
 Searching for: [62213227]
@@ -33,5 +33,5 @@ Searching for: [68792]
 Elapsed time: 461ns
 Found: false
 No of read: 17
-AVL BST Tree length: 20
+Balanced bianry tree length: 20
 ```
