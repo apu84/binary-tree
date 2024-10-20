@@ -1,6 +1,19 @@
 name: Binary tree build
 
-on: [push]
+on:
+  push:
+    branches:
+        - develop
+  workflow_dispatch:
+    inputs:
+      N:
+        description: 'Value for N'
+        required: true
+        default: '100000'
+      MAX_VALUE:
+        description: 'Value for MAX_VALUE'
+        required: true
+        default: '100000000'
 
 jobs:
   build:
@@ -21,4 +34,7 @@ jobs:
       run: cargo build --verbose
 
     - name: Run
-      run: cargo run
+      run: |
+        export N=${{ github.event.inputs.N }}
+        export MAX_VALUE=${{ github.event.inputs.MAX_VALUE }}
+        cargo run
