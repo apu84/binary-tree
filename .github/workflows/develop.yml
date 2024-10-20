@@ -8,12 +8,12 @@ on:
     inputs:
       N:
         description: 'Value for N'
-        required: true
-        default: '100000'
+        required: false
+        default: ''
       MAX_VALUE:
         description: 'Value for MAX_VALUE'
-        required: true
-        default: '100000000'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -35,6 +35,10 @@ jobs:
 
     - name: Run
       run: |
-        export N=${{ github.event.inputs.N }}
-        export MAX_VALUE=${{ github.event.inputs.MAX_VALUE }}
+        if [ -z "${{ github.event.inputs.N }}" ]; then
+         export $(cat .env | xargs)
+        else
+         export N=${{ github.event.inputs.N }}
+         export MAX_VALUE=${{ github.event.inputs.MAX_VALUE }}
+        fi
         cargo run
